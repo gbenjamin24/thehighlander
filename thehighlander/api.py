@@ -1,7 +1,12 @@
-from flask import Blueprint, jsonify
-import os, requests, random, datetime
+from flask import Blueprint, jsonify, request, current_app
+import os, requests, random, datetime, logging
 
 api = Blueprint("api", __name__)
+
+# Configure logging
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s',
+                    handlers=[logging.StreamHandler()])
 
 @api.route("/basketball_games")
 def basketball_games():
@@ -45,7 +50,7 @@ def weekly_basketball_games():
     #   },
     #   ...
     # ]
-    
+
     # Calculate date range for next 7 days
     start_date = datetime.date.today()
     end_date = start_date + datetime.timedelta(days=7)
@@ -81,12 +86,13 @@ def weekly_basketball_games():
 
 @api.route("/suggest_team", methods=["POST"])
 def suggest_team():
+
+    game_data = request.get_json()
+    # current_app.logger.info(f"Received game data: {game_data}")
+
     teams = [
-        "Los Angeles Lakers",
-        "Boston Celtics",
-        "Golden State Warriors",
-        "Chicago Bulls",
-        "San Antonio Spurs",
+        game_data['home_team']['name'],
+        game_data['away_team']['name']
     ]
     suggested_team = random.choice(teams)
     return jsonify({"team_name": suggested_team})
