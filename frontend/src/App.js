@@ -87,7 +87,7 @@ function App() {
         {selectedGame && (
           <Row className="justify-content-center mb-4">
             <Col xs={12} md={8} className="text-center">
-              <h3>Bet on {selectedGame.suggestedTeam}</h3>
+              <h3>{selectedGame.suggestedTeam}</h3>
             </Col>
           </Row>
         )}

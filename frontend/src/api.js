@@ -14,5 +14,5 @@ export async function suggestTeam(game) {
     body: JSON.stringify(game),
   });
   const suggestedTeam = await response.json();
-  return (`${suggestedTeam.team_name}`);
+  return (`Bet on: ${suggestedTeam.team_name} \n Confidence: ${suggestedTeam.confidence} \n Reason: ${suggestedTeam.reason}`);
 }

@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request, current_app
-import os, requests, random, datetime, logging
+import os, requests, random, datetime, logging, openai, json
+from .stats import get_teams_player_stats
 
 api = Blueprint("api", __name__)
 
@@ -83,7 +84,6 @@ def weekly_basketball_games():
     # Return game data as JSON response
     return jsonify(games)
 
-
 @api.route("/suggest_team", methods=["POST"])
 def suggest_team():
 
@@ -94,5 +94,30 @@ def suggest_team():
         game_data['home_team']['name'],
         game_data['away_team']['name']
     ]
-    suggested_team = random.choice(teams)
-    return jsonify({"team_name": suggested_team})
+    player_stats = get_teams_player_stats(teams)
+    # current_app.logger.info(f"gathered stats data: {player_stats}")
+    try:
+        openai.api_key = os.environ.get("OPENAI_API_KEY")
+        # Create a prompt for the OpenAI API
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": 'you are helping a developer with a open source webapp this webapp leverages open ai to consider the stats of all players on 2 competing BASKETBALL teams and uses these stats to offer a potential winner... lets try it out Ill give you the stats and you return me a json with a key for the potential winning team based on stats this key should be labeled "winner"  you should also return a key "confidence" which is the likelihood your winner key is correct and a key "explanation" which explains what you saw significant affecting your guess in the statistics. YOU SHOULD ONLY ANSER IN JSON FORMAT!'},
+                {"role": "user", "content": f"{player_stats}"}
+            ]
+        )
+        message_content = response.choices[0].message['content']
+        # current_app.logger.info(f"openai output: {response}")
+        # prediction = extract_json_from_message(message_content)
+        ai_guess=json.loads(message_content)
+        # current_app.logger.info(f"openai output: {json.loads(message_content)}")
+        suggested_team = ai_guess['winner']
+        confidence = "{:.0%}".format(ai_guess['confidence'])
+        reason = ai_guess['explanation']
+    except:
+        suggested_team = random.choice(teams)
+        confidence = "0%"
+        reason = "N/A"
+        
+    
+    return jsonify({"team_name": suggested_team, "confidence": confidence, "reason": reason})
