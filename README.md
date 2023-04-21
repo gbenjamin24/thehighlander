@@ -29,6 +29,7 @@ cd thehighlander
 ```
 cd frontend
 npm install
+npm run build
 ```
 
 4. Create an .env file in the thehighlander directory
