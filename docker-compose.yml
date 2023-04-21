@@ -1,0 +1,8 @@
+version: "3.9"
+services:
+  the_highlander:
+    build: .
+    ports:
+      - "2121:2121"
+    volumes:
+      - ./logs:/app/logs

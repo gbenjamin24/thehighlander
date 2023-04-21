@@ -1,0 +1,23 @@
+/* frontend/src/components/GameCard.css */
+  .game-card {
+    width: 200px;
+    margin: 0 10px;
+    cursor: pointer;
+    background-color: transparent !important;
+    border: 1px solid white;
+  }
+  
+  .game-card:hover {
+    opacity: 0.8;
+  }
+  
+  .game-card .team {
+    display: flex;
+    align-items: center;
+  }
+  
+  .game-card .team img {
+    width: 50px;
+    height: 50px;
+    margin-right: 5px;
+  }
